@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">VS meiersev chat</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="enter_name">Enter your name</string>
+    <string name="join">JOIN</string>
+    <string name="server_address">Server address:</string>
+    <string name="server_port">Server port:</string>
+    <string name="get_chat_log">GET CHAT LOG</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="save">SAVE</string>
+    <string name="title_activity_chat">ChatActivity</string>
+</resources>
