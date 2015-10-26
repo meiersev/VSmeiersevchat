@@ -3,7 +3,7 @@ package ch.ethz.inf.vs.a3.clock;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ethz.inf.vs.a3.solution.clock.LamportClock;
+//import ch.ethz.inf.vs.a3.solution.clock.LamportClock;
 
 public class LamportClockTests {
 	private final int testTime = 5;
@@ -101,7 +101,7 @@ public class LamportClockTests {
 		String input = new Integer(testTime).toString();
 		LamportClock refClock = new LamportClock();
 		refClock.setClockFromString(input);
-		Assert.assertEquals("The lamport time should be" + testTime, refClock.getTime(), testTime);
+		Assert.assertEquals("The lamport time should be " + testTime, testTime, refClock.getTime());
 	}
 	
 	@Test

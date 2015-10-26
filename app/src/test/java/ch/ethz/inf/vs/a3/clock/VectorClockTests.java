@@ -3,7 +3,7 @@ package ch.ethz.inf.vs.a3.clock;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.ethz.inf.vs.a3.solution.clock.VectorClock;
+//import ch.ethz.inf.vs.a3.solution.clock.VectorClock;
 
 public class VectorClockTests {
 	private static final int[] testTimes = { 71, 70, 1 };
@@ -219,7 +219,7 @@ public class VectorClockTests {
 	@Test
 	public void convertEmptyClockToString() {
 		VectorClock refClock = new VectorClock();
-		Assert.assertEquals(refClock.toString(), "{}");
+		Assert.assertEquals("{}", refClock.toString());
 	}
 	
 	@Test
@@ -229,7 +229,7 @@ public class VectorClockTests {
 		for (int i = 0; i < refTimes.length; i++) {
 			refClock.addProcess(i, refTimes[i]);
 		}
-		Assert.assertEquals(refClock.toString(), "{\"0\":71,\"1\":70,\"2\":5}");
+		Assert.assertEquals("{\"0\":71,\"1\":70,\"2\":5}", refClock.toString());
 	}
 	
 	@Test
@@ -240,7 +240,7 @@ public class VectorClockTests {
 			refClock.addProcess(i, refTimes[i]);
 		}
 		refClock.setClockFromString("{}");
-		Assert.assertEquals(refClock.toString(), "{}");
+		Assert.assertEquals("{}", refClock.toString());
 	}
 	
 	@Test
@@ -251,7 +251,7 @@ public class VectorClockTests {
 			refClock.addProcess(i, refTimes[i]);
 		}	
 		refClock.setClockFromString("{\"0\":1,\"1\":2,\"2\":3}");
-		Assert.assertEquals(refClock.toString(), "{\"0\":1,\"1\":2,\"2\":3}");
+		Assert.assertEquals("{\"0\":1,\"1\":2,\"2\":3}", refClock.toString());
 	}
 	
 	@Test
@@ -262,7 +262,7 @@ public class VectorClockTests {
 			refClock.addProcess(i, refTimes[i]);
 		}		
 		refClock.setClockFromString("{\"0\":1,\"1\":TT,\"2\":3}");
-		Assert.assertEquals(refClock.toString(), "{\"0\":71,\"1\":70,\"2\":5}");
+		Assert.assertEquals("{\"0\":71,\"1\":70,\"2\":5}", refClock.toString());
 	}
 
 }
