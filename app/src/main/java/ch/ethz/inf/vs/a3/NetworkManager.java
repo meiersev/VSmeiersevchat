@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +37,14 @@ public class NetworkManager {
         new NetworkWorker().execute(message);
     }
 
+    public String receiveMessage(){
+        return "";
+    }
 
     class NetworkWorker extends AsyncTask<Message, Void, String> {
         private final int NUMBER_OF_RETRIES = 5;
         private String uuid;
+        private DatagramSocket socket;
         @Override
         protected String doInBackground(Message... message) {
             try {
@@ -49,13 +54,16 @@ public class NetworkManager {
                 byte[] buf = jsonMessage.toString().getBytes();
                 // create socket
                 InetAddress address = InetAddress.getByName(NetworkConsts.SERVER_ADDRESS);
-                DatagramSocket socket = new DatagramSocket(NetworkConsts.UDP_PORT);
-                socket.setReuseAddress(true);
+                socket = new DatagramSocket(NetworkConsts.UDP_PORT);
+//                socket.setReuseAddress(true);
                 socket.setSoTimeout(MainActivity.UDP_TIMEOUT);
                 // create packet
                 DatagramPacket packet = new DatagramPacket(buf, buf.length, address, NetworkConsts.UDP_PORT);
                 Log.i("sending", new String(packet.getData(), 0, packet.getLength()));
                 socket.send(packet);
+                if(message[0].getType().equals(MessageTypes.RETRIEVE_CHAT_LOG)){
+                    return getChatLog();
+                }
                 // receive response (try again if no response)
                 buf = new byte[2024];
                 DatagramPacket getAck = new DatagramPacket(buf, buf.length);
@@ -81,6 +89,26 @@ public class NetworkManager {
                 e.printStackTrace();
             }
             return "-1";
+        }
+
+        protected String getChatLog(){
+            try{
+                byte[] buf = new byte[2024];
+                DatagramPacket getMessage = new DatagramPacket(buf, buf.length);
+                String received;
+                while (true){
+                    try{
+                        socket.receive(getMessage);
+                        received = new String(getMessage.getData(), 0, getMessage.getLength());
+                        ChatActivity.addToBuffer(Message.fromString(received));
+                    }catch (SocketTimeoutException ste){
+                        break;
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return "-3";
         }
 
         @Override

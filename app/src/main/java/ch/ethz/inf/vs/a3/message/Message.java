@@ -20,12 +20,14 @@ public class Message {
     private final UUID uuid;
     private VectorClock timestamp;
     private JSONObject jsonObject;
+    private String content;
 
     public Message(String user, UUID uuid, String type, VectorClock timestamp, String content){
         this.username = user;
         this.uuid = uuid;
         this.type = type;
         this.timestamp = timestamp;
+        this.content = content;
         try {
             jsonObject = new JSONObject();
             JSONObject header = new JSONObject();
@@ -46,6 +48,25 @@ public class Message {
         }
     }
 
+    public static Message fromString(String s){
+        try{
+            JSONObject jsonObject = new JSONObject(s);
+            JSONObject header = new JSONObject(jsonObject.getString("header"));
+            JSONObject body = new JSONObject(jsonObject.getString("body"));
+            VectorClock clock = new VectorClock();
+            clock.setClockFromString(header.getString("timestamp"));
+            return new Message(header.getString("username"), UUID.fromString(header.getString("uuid")),
+                    header.getString("type"), clock, body.getString("content"));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getType(){
+        return type;
+    }
+
     public JSONObject getMessage(){
         return jsonObject;
     }
@@ -56,5 +77,9 @@ public class Message {
 
     public UUID getUUID(){
         return uuid;
+    }
+
+    public String getContent(){
+        return content;
     }
 }

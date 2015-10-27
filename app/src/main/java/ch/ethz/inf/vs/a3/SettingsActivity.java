@@ -54,6 +54,8 @@ public class SettingsActivity extends AppCompatActivity {
         Log.i(TAG, "set server address to: " + NetworkConsts.SERVER_ADDRESS);
         try {
             NetworkConsts.UDP_PORT = Integer.parseInt(serverPortEdit.getText().toString());
+            this.finish();
+            Log.i(TAG, "set server port to: " + NetworkConsts.UDP_PORT);
         }catch (NumberFormatException e){
             // alert user when port has invalid format
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -62,7 +64,5 @@ public class SettingsActivity extends AppCompatActivity {
             AlertDialog dialog = alertDialogBuilder.create();
             dialog.show();
         }
-        Log.i(TAG, "set server port to: " + NetworkConsts.UDP_PORT);
-
     }
 }

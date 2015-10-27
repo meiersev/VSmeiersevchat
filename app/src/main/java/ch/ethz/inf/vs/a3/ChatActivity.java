@@ -1,11 +1,14 @@
 package ch.ethz.inf.vs.a3;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.PriorityQueue;
 import java.util.UUID;
@@ -19,7 +22,8 @@ public class ChatActivity extends AppCompatActivity implements NetworkListener{
     private NetworkManager networkManager;
     private String username;
     private UUID uuid;
-    private PriorityQueue<Message> messageBuffer;
+    private static PriorityQueue<Message> messageBuffer;
+    private TextView chatLog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,7 @@ public class ChatActivity extends AppCompatActivity implements NetworkListener{
         username = intent.getStringExtra("username");
         uuid = UUID.fromString(intent.getStringExtra("uuid"));
         messageBuffer = new PriorityQueue<>(11, new MessageComparator());
+        chatLog = (TextView) findViewById(R.id.chat_log);
     }
 
     @Override
@@ -64,11 +69,33 @@ public class ChatActivity extends AppCompatActivity implements NetworkListener{
     }
 
     public void onClickRetrieveLog(View v){
+        messageBuffer.clear();
         Message message = new Message(username, uuid, MessageTypes.RETRIEVE_CHAT_LOG, new VectorClock(), null);
         networkManager.sendMessage(message);
     }
 
+    public static void addToBuffer(Message m){
+        messageBuffer.add(m);
+    }
+
     public void onReceiveMessage(String message){
-        // todo: part 3
+        if(message.equals("-1")){
+            Log.w("Error", "something went wrong with server response");
+            return;
+        }else if(message.equals("-2")){
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle("ERROR");
+            alertDialogBuilder.setMessage("Could not connect to Server");
+            AlertDialog dialog = alertDialogBuilder.create();
+            dialog.show();
+            return;
+        }else if (message.equals("-3")){
+            // we have now all messages in the queue
+            chatLog.setText("");
+            Message m;
+            while ((m = messageBuffer.poll()) != null){
+                chatLog.append(m.getContent());
+            }
+        }
     }
 }
