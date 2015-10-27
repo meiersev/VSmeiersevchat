@@ -19,6 +19,7 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.UUID;
 
+import ch.ethz.inf.vs.a3.clock.VectorClock;
 import ch.ethz.inf.vs.a3.message.ErrorCodes;
 import ch.ethz.inf.vs.a3.message.Message;
 import ch.ethz.inf.vs.a3.message.MessageTypes;
@@ -69,11 +70,10 @@ public class MainActivity extends AppCompatActivity implements NetworkListener {
         super.onDestroy();
     }
 
-    // Todo: send 'register' message to server
     public void onClickJoin(View v){
         username = editUsername.getText().toString();
         uuid = UUID.randomUUID();
-        Message message = new Message(username, uuid, MessageTypes.REGISTER);
+        Message message = new Message(username, uuid, MessageTypes.REGISTER, new VectorClock(), null);
         networkManager.sendMessage(message);
     }
 
@@ -103,19 +103,13 @@ public class MainActivity extends AppCompatActivity implements NetworkListener {
                 intent.putExtra("username", username);
                 intent.putExtra("uuid", uuid.toString());
                 startActivity(intent);
-            }else if(responseHeader.getString("type").equals(MessageTypes.ERROR_MESSAGE)) {
-                // todo implement this
-                Log.w("got error", "need to implement this");
+            }else if(responseHeader.getString("type").equals(MessageTypes.ERROR_MESSAGE)){
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                 alertDialogBuilder.setTitle("ERROR");
                 // figure out what went wrong
                 JSONObject responseBody = new JSONObject(response.getString("body"));
                 int error = responseBody.getInt("content");
-                if(error == ErrorCodes.REG_FAIL){
-                    alertDialogBuilder.setMessage("User registration failed");
-                }else{
-                    alertDialogBuilder.setMessage("Server responded with error code: " + error);
-                }
+                alertDialogBuilder.setMessage(ErrorCodes.getStringError(error));
                 AlertDialog dialog = alertDialogBuilder.create();
                 dialog.show();
                 return;

@@ -11,7 +11,7 @@ public class MessageComparator implements Comparator<Message> {
     @Override
     public int compare(Message lhs, Message rhs) {
         // Write your code here
-
+        lhs.getTimestamp().happenedBefore(rhs.getTimestamp());
         return 0;
     }
 

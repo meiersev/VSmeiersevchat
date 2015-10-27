@@ -22,8 +22,7 @@ import ch.ethz.inf.vs.a3.udpclient.NetworkConsts;
 public class NetworkManager {
     protected List<NetworkListener> listeners = new ArrayList<>();
 
-    public NetworkManager() {
-    }
+    public NetworkManager() {    }
 
     public void registerListener(NetworkListener n) {
         listeners.add(n);
@@ -60,13 +59,18 @@ public class NetworkManager {
                 // receive response (try again if no response)
                 buf = new byte[2024];
                 DatagramPacket getAck = new DatagramPacket(buf, buf.length);
-                for (int i = 0; i < NUMBER_OF_RETRIES; i ++){
+                int i;
+                for (i = 0; i < NUMBER_OF_RETRIES; i ++){
                     try{
                         socket.receive(getAck);
                         break;
                     }catch (SocketTimeoutException t){
                         socket.send(packet);
+                        Log.i("sending", new String(packet.getData(), 0, packet.getLength()));
                     }
+                }
+                if(i == NUMBER_OF_RETRIES){
+                    return "-2";
                 }
                 socket.disconnect();
                 socket.close();

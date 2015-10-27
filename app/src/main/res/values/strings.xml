@@ -8,6 +8,7 @@
     <string name="server_address">Server address:</string>
     <string name="server_port">Server port:</string>
     <string name="get_chat_log">GET CHAT LOG</string>
+    <string name="chat_log_empty">The chat log is empty</string>
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="save">SAVE</string>
     <string name="title_activity_chat">ChatActivity</string>
