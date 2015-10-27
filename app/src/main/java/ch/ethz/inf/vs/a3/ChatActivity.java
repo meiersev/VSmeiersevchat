@@ -29,13 +29,15 @@ public class ChatActivity extends AppCompatActivity implements NetworkListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        chatLog = (TextView) findViewById(R.id.chat_log);
         networkManager = new NetworkManager();
         networkManager.registerListener(this);
         Intent intent = getIntent();
         username = intent.getStringExtra("username");
         uuid = UUID.fromString(intent.getStringExtra("uuid"));
+        // initialize queue as buffer and for ordering
         messageBuffer = new PriorityQueue<>(11, new MessageComparator());
-        chatLog = (TextView) findViewById(R.id.chat_log);
     }
 
     @Override
@@ -62,6 +64,7 @@ public class ChatActivity extends AppCompatActivity implements NetworkListener{
 
     @Override
     public void onDestroy(){
+        // deregister user from server when activity is destroyed
         Message message = new Message(username, uuid, MessageTypes.DEREGISTER, new VectorClock(), null);
         networkManager.sendMessage(message);
         networkManager.unregisterListener(this);
@@ -74,6 +77,7 @@ public class ChatActivity extends AppCompatActivity implements NetworkListener{
         networkManager.sendMessage(message);
     }
 
+    // let AsyncTaxk add the messages to the queue
     public static void addToBuffer(Message m){
         messageBuffer.add(m);
     }
@@ -82,19 +86,13 @@ public class ChatActivity extends AppCompatActivity implements NetworkListener{
         if(message.equals("-1")){
             Log.w("Error", "something went wrong with server response");
             return;
-        }else if(message.equals("-2")){
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-            alertDialogBuilder.setTitle("ERROR");
-            alertDialogBuilder.setMessage("Could not connect to Server");
-            AlertDialog dialog = alertDialogBuilder.create();
-            dialog.show();
-            return;
         }else if (message.equals("-3")){
             // we have now all messages in the queue
             chatLog.setText("");
             Message m;
             while ((m = messageBuffer.poll()) != null){
-                chatLog.append(m.getContent());
+                Log.w("time",m.getContent() + " :   " +  m.getTimestamp().toString());
+                chatLog.append(m.getContent() + "\n");
             }
         }
     }

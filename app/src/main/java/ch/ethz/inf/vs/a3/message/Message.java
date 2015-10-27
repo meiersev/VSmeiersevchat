@@ -28,35 +28,22 @@ public class Message {
         this.type = type;
         this.timestamp = timestamp;
         this.content = content;
-        try {
-            jsonObject = new JSONObject();
-            JSONObject header = new JSONObject();
-            header.put("username", username);
-            header.put("uuid", uuid.toString());
-            header.put("timestamp", timestamp.toString());
-            header.put("type", type);
-            jsonObject.put("header", header);
-            JSONObject body = null;
-            if(type == MessageTypes.CHAT_MESSAGE){
-                body = new JSONObject();
-                body.put("content", content);
-            }
-            jsonObject.put("body", body);
-
-        }catch (JSONException e){
-            e.printStackTrace();
-        }
+        jsonObject = null;
     }
 
+    // return a new Message from a String representing a JSON object following the protocol specifications
     public static Message fromString(String s){
         try{
             JSONObject jsonObject = new JSONObject(s);
             JSONObject header = new JSONObject(jsonObject.getString("header"));
             JSONObject body = new JSONObject(jsonObject.getString("body"));
+            String name = header.getString("username");
+            UUID uuid = UUID.fromString(header.getString("uuid"));
+            String type = header.getString("type");
             VectorClock clock = new VectorClock();
             clock.setClockFromString(header.getString("timestamp"));
-            return new Message(header.getString("username"), UUID.fromString(header.getString("uuid")),
-                    header.getString("type"), clock, body.getString("content"));
+            String content = body.getString("content");
+            return new Message(name, uuid, type, clock, content);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -68,15 +55,33 @@ public class Message {
     }
 
     public JSONObject getMessage(){
+        if(jsonObject == null){
+            // build a JSON object
+            try {
+                jsonObject = new JSONObject();
+                JSONObject header = new JSONObject();
+                header.put("username", username);
+                header.put("uuid", uuid.toString());
+                header.put("timestamp", timestamp.toString());
+                header.put("type", type);
+                jsonObject.put("header", header);
+                // we only ever put something in the body when it is a chat message
+                JSONObject body = null;
+                if(type.equals(MessageTypes.CHAT_MESSAGE)){
+                    body = new JSONObject();
+                    body.put("content", content);
+                }
+                jsonObject.put("body", body);
+
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+        }
         return jsonObject;
     }
 
     public VectorClock getTimestamp(){
         return timestamp;
-    }
-
-    public UUID getUUID(){
-        return uuid;
     }
 
     public String getContent(){
